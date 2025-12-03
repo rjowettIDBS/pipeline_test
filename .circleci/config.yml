@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   hello-world-job:
     docker:
-      - image: apline:3.15
+      - image: alpine:3.15
     steps:
       - run:
           name: Hello World Step
