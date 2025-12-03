@@ -8,6 +8,9 @@ jobs:
       - run:
           name: Hello World Step
           command:  echo "Hello, World!" > hello.txt
+      - store_artifacts:
+          path: hello.txt
+          destination: hello.txt
 
 workflows:
   hello-world-workflow:
