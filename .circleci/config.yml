@@ -10,3 +10,10 @@ jobs:
           command: |
             echo "Hello, World!"
             echo "SUCCESS!!! WOOHOOO!!!"
+workflow:
+  hello-world-workflow:
+      jobs:
+      - Hello World
+      - Fetch-Code:
+          requires:
+            - hello-world-job
