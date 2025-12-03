@@ -12,5 +12,8 @@ jobs:
 workflows:
   hello-world-workflow:
       jobs:
-      - hello-world-job
+      - hello-world-job:
+          filters:
+            branches:
+              only: master
 
