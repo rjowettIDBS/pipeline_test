@@ -3,12 +3,12 @@ version: 2.1
 jobs:
   hello-world-job:
     docker:
-      - image: cimg/python:3.1
+      - image: cimg/python:3.14.1
     steps:
       - run:
           name: Hello World Step
           command:  echo "Hello, World!" > hello.txt
-          
+
 workflows:
   hello-world-workflow:
       jobs:
