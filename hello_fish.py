@@ -5,3 +5,4 @@ print(f"Are you a fish? Answer = {fish}")
 print("I am a fish.")
 
 print ("I love fish.")
+print("Fish are my friends.")
