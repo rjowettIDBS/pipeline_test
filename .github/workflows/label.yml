@@ -1,0 +1,23 @@
+name: Label Copilot-reviewed PRs
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    if: github.event.review.user.login == 'copilot-pull-request-reviewer[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Add ai-assisted label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --method POST "repos/${GH_REPO}/issues/${PR_NUMBER}/labels" \
+            -f 'labels[]=ai-assisted' --silent
