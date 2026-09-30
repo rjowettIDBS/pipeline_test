@@ -5,36 +5,29 @@ on:
     types: [submitted, edited]
 
 permissions:
-  issues: write
   pull-requests: read
+  issues: write
 
 jobs:
   label:
-    if: github.event.review.user.login == 'copilot-pull-request-reviewer[bot]'
+    if: contains(github.event.review.user.login, 'copilot')
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+
     steps:
-      - name: Check if label already exists
-        id: check_label
+      - name: Check existing labels and add ai-assisted if missing
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          # Check if ai-assisted label already exists on the PR
-          labels=$(gh api "repos/${GH_REPO}/issues/${PR_NUMBER}" --jq '.labels[].name' 2>/dev/null || echo "")
-          if echo "$labels" | grep -q "ai-assisted"; then
-            echo "already_labeled=true" >> $GITHUB_OUTPUT
-          else
-            echo "already_labeled=false" >> $GITHUB_OUTPUT
+          labels=$(gh api "repos/${GH_REPO}/issues/${PR_NUMBER}" --jq '.labels[].name' 2>/dev/null || true)
+
+          if echo "$labels" | grep -qx "ai-assisted"; then
+            echo "Label already exists"
+            exit 0
           fi
 
-      - name: Add ai-assisted label
-        if: steps.check_label.outputs.already_labeled == 'false'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          gh api --method POST "repos/${GH_REPO}/issues/${PR_NUMBER}/labels" \
-            -f 'labels[]=ai-assisted' --silent
+          gh api \
+            --method POST \
+            "repos/${GH_REPO}/issues/${PR_NUMBER}/labels" \
+            -f 'labels[]=ai-assisted'
