@@ -1,10 +1,11 @@
 name: Label Copilot-reviewed PRs
 
 on:
-  pull_request_review:
+  pull_request_target:
     types: [submitted, edited]
 
 permissions:
+  contents: read
   pull-requests: read
   issues: write
 
@@ -14,15 +15,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check existing labels and add ai-assisted if missing
+      - name: Add ai-assisted label if missing
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+        shell: bash
         run: |
-          labels=$(gh api "repos/${GH_REPO}/issues/${PR_NUMBER}" --jq '.labels[].name' 2>/dev/null || true)
+          set -euo pipefail
 
-          if echo "$labels" | grep -qx "ai-assisted"; then
+          if gh api \
+            "repos/${GH_REPO}/issues/${PR_NUMBER}/labels" \
+            --jq '.[].name' |
+            grep -Fxq 'ai-assisted'; then
             echo "Label already exists"
             exit 0
           fi
